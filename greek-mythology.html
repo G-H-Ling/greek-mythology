@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Olympus · Greek Mythology</title>
+<style>
+  :root { --bg:#061329; --ink:#eef4ff; --muted:#91a4c4; --gold:#f2c66d; --line:#6d8bbd; --god:#f2b84b; --demigod:#69d4cb; --mortal:#e99783; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink); }
+  body { font-family: "Times New Roman", FangSong, serif; }
+  .app { width:100%; height:100%; position:relative; overflow:hidden; background:
+    radial-gradient(circle at 72% 25%, rgba(30,74,141,.22), transparent 30%),
+    radial-gradient(circle at 20% 80%, rgba(17,57,112,.22), transparent 34%),
+    #061329; }
+  .app:before,.app:after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.6; background-image:radial-gradient(circle, #fff 0 1px, transparent 1.6px), radial-gradient(circle, rgba(170,205,255,.75) 0 1px, transparent 1.5px); background-size:97px 113px, 157px 181px; background-position:13px 8px, 42px 73px; }
+  .app:after { opacity:.25; filter:blur(.4px); background-size:231px 207px, 311px 281px; }
+  .topbar { position:absolute; z-index:4; top:24px; left:30px; right:30px; display:flex; justify-content:space-between; align-items:flex-start; pointer-events:none; }
+  .brand { pointer-events:auto; }
+  .eyebrow { font:12px/1.2 "Times New Roman",serif; color:var(--gold); letter-spacing:3px; text-transform:uppercase; }
+  h1 { margin:5px 0 2px; font-size:clamp(23px,3vw,39px); font-weight:normal; letter-spacing:.5px; }
+  .subtitle { color:var(--muted); font-family:FangSong,serif; font-size:14px; }
+  .controls { pointer-events:auto; width:220px; padding:12px 15px; border-left:1px solid rgba(132,165,218,.5); background:rgba(4,16,37,.56); backdrop-filter:blur(8px); }
+  .controls label { display:flex; justify-content:space-between; font:13px FangSong,serif; color:#c8d4e9; margin-bottom:8px; }
+  #density { width:100%; accent-color:var(--gold); cursor:pointer; }
+  .legend { display:flex; gap:11px; margin-top:11px; color:#aab9d1; font:12px FangSong,serif; }
+  .legend span { white-space:nowrap; }.dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:4px; }.g{background:var(--god)}.d{background:var(--demigod)}.m{background:var(--mortal)}
+  #graph { position:absolute; inset:0; width:100%; height:100%; }
+  .edge { stroke:var(--line); stroke-width:1.1; opacity:.14; transition:opacity .25s, stroke-width .25s; }.edge.related { opacity:.95; stroke:#f2d38d; stroke-width:2.2; }.edge-label { fill:#e6c98e; opacity:0; font:13px FangSong,serif; paint-order:stroke; stroke:#07162d; stroke-width:4px; transition:opacity .25s; }.edge-label.related{opacity:1}
+  .node { cursor:pointer; transition:filter .25s; }.node circle { stroke-width:1.4; transition:transform .25s, stroke-width .25s, fill .25s; transform-origin:center; }.node:hover circle { stroke:#fff; stroke-width:3; filter:drop-shadow(0 0 10px currentColor); }.node.selected circle { stroke:#fff3c4; stroke-width:3; filter:drop-shadow(0 0 15px currentColor); }.node.dimmed { opacity:.25; }.node text { pointer-events:none; text-anchor:middle; }.node .en { font:16px "Times New Roman",serif; fill:#fff; }.node .zh { font:13px FangSong,serif; fill:#e1e8f6; }.node .type { font:10px FangSong,serif; fill:#9eafd0; opacity:.85; }
+  .node.god circle { fill:rgba(167,112,29,.82); stroke:var(--god); }.node.demigod circle { fill:rgba(28,119,117,.8); stroke:var(--demigod); }.node.mortal circle { fill:rgba(137,59,61,.8); stroke:var(--mortal); }
+  .hint { position:absolute; left:30px; bottom:24px; z-index:3; color:#8194b5; font:12px FangSong,serif; letter-spacing:.5px; }
+  .panel { position:absolute; z-index:5; top:108px; right:30px; width:min(360px,calc(100vw - 60px)); max-height:calc(100vh - 145px); overflow:auto; padding:21px 22px 23px; background:rgba(7,20,43,.9); border:1px solid rgba(139,169,218,.42); box-shadow:0 20px 60px rgba(0,0,0,.32); backdrop-filter:blur(12px); transform:translateX(120%); transition:transform .35s ease; }
+  .panel.open { transform:translateX(0); }.close { position:absolute; top:10px; right:13px; border:0; background:none; color:#a7b9d8; font-size:24px; cursor:pointer; }.panel .kind { font:11px "Times New Roman",serif; letter-spacing:2px; color:var(--gold); text-transform:uppercase; }.panel h2 { margin:5px 30px 0 0; font-size:28px; font-weight:normal; }.panel h2 small { display:block; margin-top:2px; color:#c7d2e5; font:18px FangSong,serif; }.panel .rule { height:1px; background:rgba(132,165,218,.3); margin:15px 0; }.panel p { margin:10px 0; color:#ced9ea; font:15px/1.7 FangSong,serif; }.panel strong { color:#f1d28a; font-weight:normal; }.panel ul { padding-left:20px; margin:7px 0 0; color:#ced9ea; font:14px/1.65 FangSong,serif; }.panel .symbols { color:#e6c98e; font:14px FangSong,serif; }.related-title { margin-top:17px!important; color:#9fb4d7!important; font-size:12px!important; letter-spacing:1px; }
+  @media (max-width:700px) { .topbar{top:16px;left:18px;right:18px}.controls{width:170px;padding:9px 11px}.legend{gap:6px; font-size:10px}.subtitle{font-size:12px}.hint{left:18px;bottom:14px}.panel{top:auto;bottom:0;right:0;width:100%;max-height:48vh;border-left:0;border-right:0}.node .en{font-size:13px}.node .zh{font-size:11px}.node .type{display:none} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><div class="brand"><div class="eyebrow">A celestial genealogy</div><h1>Olympus · Greek Mythology</h1><div class="subtitle">希腊神话人物关系图 · 点击星辰探索家谱与传说</div></div><div class="controls"><label><span>星图密度</span><b id="densityValue">居中</b></label><input id="density" type="range" min="0" max="100" value="50" aria-label="星图密度"><div class="legend"><span><i class="dot g"></i>神</span><span><i class="dot d"></i>半神</span><span><i class="dot m"></i>凡人</span></div></div></div>
+  <svg id="graph" role="img" aria-label="Greek mythology relationship map"></svg>
+  <div class="hint">HOVER TO MAGNIFY · CLICK TO TRACE RELATIONSHIPS</div>
+  <aside class="panel" id="panel"><button class="close" id="close" aria-label="关闭">×</button><div id="panelContent"></div></aside>
+</div>
+<script>
+const people = [
+{id:'zeus',en:'Zeus',zh:'宙斯',type:'god',role:'奥林匹斯众神之王，天空与雷电之神',facts:'推翻泰坦神族后成为众神统治者。以多情著称，常化身不同形态与凡间女子结合；他曾发誓让 Perseid 家族下一个出生的儿子统治希腊。',relations:'Cronus 与 Rhea 之子；Hera 的丈夫；Heracles、Perseus 等多位英雄的父亲。',symbols:'雷霆 · 鹰 · 橡树'},
+{id:'hera',en:'Hera',zh:'赫拉',type:'god',role:'婚姻与家庭女神，奥林匹斯天后',facts:'因 Zeus 不断与其他女子生育子女而嫉妒，终生迫害 Heracles。她曾让 Eurystheus 先于 Heracles 出生，夺走王位，并诱发 Heracles 发疯杀亲。',relations:'Zeus 的妻子与姐姐；Heracles 的迫害者。',symbols:'孔雀 · 王冠 · 石榴'},
+{id:'ares',en:'Ares',zh:'阿瑞斯',type:'god',role:'战神',facts:'奥林匹斯十二主神之一，象征战争的暴力与混乱面。',relations:'Zeus 与 Hera 之子；少数版本为 Hera 独自所生。',symbols:'长矛 · 头盔 · 秃鹫'},
+{id:'hephaestus',en:'Hephaestus',zh:'赫淮斯托斯',type:'god',role:'火神、锻造之神',facts:'奥林匹斯十二主神之一，为众神打造武器与神器。',relations:'Hera 之子；有版本为 Zeus 与 Hera 之子，也有版本为 Hera 独自所生。',symbols:'铁锤 · 铁砧 · 火'},
+{id:'hebe',en:'Hebe',zh:'赫柏',type:'god',role:'青春女神',facts:'在奥林匹斯山为众神斟酒。Heracles 死后升入奥林匹斯成为神，与 Hera 和解后娶了 Hebe。',relations:'Zeus 与 Hera 之女；Heracles 升神后的妻子。',symbols:'金杯 · 青春之泉'},
+{id:'eileithyia',en:'Eileithyia',zh:'厄勒梯亚',type:'god',role:'分娩女神',facts:'掌管分娩。Heracles 出生时，Hera 让她阻止 Alcmene 分娩，同时让 Eurystheus 提前出生。',relations:'Zeus 与 Hera 之女。',symbols:'火炬 · 分娩的妇女'},
+{id:'heracles',en:'Heracles / Hercules',zh:'赫拉克勒斯 / 海格力斯',type:'demigod',role:'半神英雄，最著名的希腊英雄',facts:'因 Hera 迫害而发疯杀亲，为赎罪完成十二项功绩。他通过苦难劳作、智慧和勇气为人类除害，死后升入奥林匹斯成为神。',relations:'Zeus（父）+ Alcmene（母）；名义父亲为 Amphitryon。配偶有 Megara、Deianeira 与 Hebe。',symbols:'狮皮 · 棍棒 · 弓',works:'杀死涅墨亚狮子、斩杀九头蛇、捕获金角鹿、活捉野猪、清理牛厩、射杀怪鸟、捕获克里特公牛、制服食人马群、夺取亚马逊女王腰带、夺取三身巨人牛群、取回金苹果、带回三头犬'},
+{id:'perseus',en:'Perseus',zh:'珀耳修斯',type:'demigod',role:'希腊英雄，Mycenae 的创立者',facts:'因神谕预言他将杀死外祖父 Acrisius，出生后被投入大海。成年后斩杀 Medusa，解救 Andromeda，成为 Mycenae 的建立者。',relations:'Zeus（父）+ Danae（母）；Andromeda 的丈夫；Heracles 的曾外祖父与同父异母兄弟。',symbols:'Medusa 的头 · 飞鞋 · 镰刀'},
+{id:'eurystheus',en:'Eurystheus',zh:'欧律斯透斯',type:'mortal',role:'Mycenae / Tiryns 国王',facts:'因 Hera 的诡计而先于 Heracles 出生，成为 Perseid 家族继承人和国王。他给 Heracles 布置了十二项功绩，后来被 Hyllus 杀死。',relations:'Sthenelus 与 Nicippe 之子；Perseus 的孙子；Heracles 的堂舅。',symbols:'王冠 · 十二项功绩的命令'},
+{id:'alcmene',en:'Alcmene',zh:'阿尔克墨涅',type:'mortal',role:'Mycenae 公主，Heracles 的母亲',facts:'Zeus 化身她的丈夫 Amphitryon 与她结合，生下 Heracles。Hera 延迟了她的分娩，以确保 Eurystheus 先出生。',relations:'Electryon 与 Anaxo 之女；Amphitryon 的妻子；Heracles 与 Iphicles 的母亲。',symbols:'摇篮 · 王室纹章'},
+{id:'amphitryon',en:'Amphitryon',zh:'安菲特律翁',type:'mortal',role:'Thebes 将军，Heracles 的养父',facts:'因误杀叔父 Electryon 而被放逐，带着 Alcmene 逃往 Thebes。Zeus 曾趁他出征时化身他的模样。',relations:'Alcaeus 与 Astydameia 之子；Alcmene 的丈夫；Heracles 名义上的父亲。',symbols:'盾牌 · 战车'},
+{id:'sthenelus',en:'Sthenelus',zh:'斯忒涅罗斯',type:'mortal',role:'Mycenae 国王',facts:'Perseus 的儿子之一。在兄弟 Electryon 被杀后，他将 Amphitryon 放逐出 Mycenae，自己继承王位。',relations:'Perseus 与 Andromeda 之子；Nicippe 的丈夫；Eurystheus 的父亲。',symbols:'王冠 · 城门'},
+{id:'nicippe',en:'Nicippe',zh:'尼基佩',type:'mortal',role:'Mycenae 王后',facts:'Pisa 国王 Pelops 的女儿。嫁给 Sthenelus 后成为 Mycenae 王后，生下 Eurystheus；她提前分娩使 Eurystheus 先出生。',relations:'Pelops 与 Hippodamia 之女；Sthenelus 的妻子；Eurystheus 的母亲。',symbols:'王后冠 · 摇篮'},
+{id:'electryon',en:'Electryon',zh:'厄勒克特律翁',type:'mortal',role:'Mycenae / Tiryns 国王，Alcmene 的父亲',facts:'Perseus 的儿子之一，Sthenelus 的兄弟。他的儿子们战死于对抗 Taphians 的战斗中，本人后来被 Amphitryon 误杀。',relations:'Perseus 与 Andromeda 之子；Anaxo 的丈夫；Alcmene 的父亲。',symbols:'王杖 · 城墙'},
+{id:'alcaeus',en:'Alcaeus',zh:'阿尔开俄斯',type:'mortal',role:'Tiryns 国王，Amphitryon 的父亲',facts:'Perseus 的儿子之一，Electryon 和 Sthenelus 的兄弟。他是 Heracles 养父 Amphitryon 的父亲。',relations:'Perseus 与 Andromeda 之子；Astydameia 的丈夫；Amphitryon 的父亲。',symbols:'王杖 · 青铜盾'},
+{id:'danae',en:'Danae',zh:'达那厄',type:'mortal',role:'Argos 公主，Perseus 的母亲',facts:'因神谕预言她的儿子将杀死 Acrisius，被父亲囚禁。Zeus 化作金雨与她结合，生下 Perseus；她和儿子后来被投入大海而获救。',relations:'Acrisius 之女；Zeus 的伴侣；Perseus 的母亲。',symbols:'金雨 · 木箱'},
+{id:'andromeda',en:'Andromeda',zh:'安德洛墨达',type:'mortal',role:'Ethiopia 公主，Perseus 的妻子',facts:'因母亲夸耀她比 Nereids 更美而被献祭给海怪。Perseus 路过时救下她并娶她为妻。',relations:'Cepheus 与 Cassiopeia 之女；Perseus 的妻子；Sthenelus、Alcaeus、Electryon 的母亲。',symbols:'锁链 · 海岸岩石'},
+{id:'megara',en:'Megara',zh:'墨伽拉',type:'mortal',role:'Thebes 公主，Heracles 的第一任妻子',facts:'Heracles 战胜 Orchomenus 后与她成婚并育有子女。Hera 诱发 Heracles 发疯，他在疯狂中杀死 Megara 和他们的孩子。',relations:'Creon 之女；Heracles 的第一任妻子。',symbols:'Thebes 王冠 · 婚纱'},
+{id:'creon',en:'Creon',zh:'克瑞翁',type:'mortal',role:'Thebes 国王',facts:'Amphitryon 逃往 Thebes 时，Creon 为他洗净误杀 Electryon 的血罪，后来将女儿 Megara 嫁给 Heracles。',relations:'Megara 的父亲；Amphitryon 的舅舅。',symbols:'城门 · 王冠'},
+{id:'pelops',en:'Pelops',zh:'珀罗普斯',type:'mortal',role:'Pisa 国王，Peloponnese 半岛得名者',facts:'Nicippe 的父亲，Eurystheus 的外祖父。他的名字与伯罗奔尼撒半岛直接相关。',relations:'Tantalus 之子；Hippodamia 的丈夫；Nicippe 的父亲。',symbols:'战车 · 王冠'},
+{id:'hippodamia',en:'Hippodamia',zh:'希波达弥亚',type:'mortal',role:'Pisa 王后',facts:'Pelops 的妻子，Nicippe 的母亲。',relations:'Oenomaus 之女；Pelops 的妻子；Nicippe 的母亲。',symbols:'战车 · 王后冠'}
+];
+const edges = [
+['cronus','zeus','父子'],['rhea','zeus','母子'],['zeus','hera','夫妻 / 姐弟'],['zeus','ares','父子'],['hera','ares','母子'],['hera','hephaestus','母子'],['zeus','hephaestus','父子（部分版本）'],['zeus','hebe','父女'],['hera','hebe','母女'],['zeus','eileithyia','父女'],['hera','eileithyia','母女'],['zeus','heracles','父子'],['alcmene','heracles','母子'],['amphitryon','heracles','名义父子'],['hera','heracles','迫害者 / 被迫害者'],['heracles','hebe','夫妻'],['zeus','perseus','父子'],['danae','perseus','母子'],['perseus','andromeda','夫妻'],['perseus','sthenelus','父子'],['andromeda','sthenelus','母子'],['perseus','electryon','父子'],['andromeda','electryon','母子'],['perseus','alcaeus','父子'],['andromeda','alcaeus','母子'],['sthenelus','eurystheus','父子'],['nicippe','eurystheus','母子'],['sthenelus','nicippe','夫妻'],['pelops','nicippe','父女'],['hippodamia','nicippe','母女'],['electryon','alcmene','父女'],['anaxo','alcmene','母女'],['alcaeus','amphitryon','父子'],['amphitryon','alcmene','夫妻'],['creon','megara','父女'],['heracles','megara','夫妻'],['eurystheus','heracles','命令者 / 被命令者']
+];
+const svg=document.getElementById('graph'), panel=document.getElementById('panel'), content=document.getElementById('panelContent'), density=document.getElementById('density'), densityValue=document.getElementById('densityValue');
+const byId=Object.fromEntries(people.map(p=>[p.id,p])); let selected=null, positions={};
+const NS='http://www.w3.org/2000/svg'; const make=(tag,attrs={})=>{const e=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e};
+function layout(){ const w=svg.clientWidth||document.documentElement.clientWidth||800, h=svg.clientHeight||document.documentElement.clientHeight||600, compact=w<700, spread=.62 + Number(density.value)/100*.55; const cx=w*(compact?.45:.46), cy=h*.54; positions={}; people.forEach((p,i)=>{const ring=i<7?1:i<13?2:3; const count=ring===1?7:ring===2?6:8; const index=ring===1?i:ring===2?i-7:i-13; const radius=Math.min(w,h)*(compact?.15:.18)*ring*spread; const angle=index/count*Math.PI*2 - Math.PI/2 + (ring===3?.18:0); positions[p.id]={x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius}; }); draw(); }
+function draw(){ svg.innerHTML=''; const w=innerWidth,h=innerHeight; const edgeLayer=make('g'), labelLayer=make('g'), nodeLayer=make('g'); svg.append(edgeLayer,labelLayer,nodeLayer); edges.forEach(([a,b,label],i)=>{if(!positions[a]||!positions[b])return; const p1=positions[a],p2=positions[b], line=make('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,class:'edge','data-a':a,'data-b':b}); edgeLayer.append(line); const tx=(p1.x+p2.x)/2,ty=(p1.y+p2.y)/2; const t=make('text',{x:tx,y:ty-4,class:'edge-label','data-a':a,'data-b':b});t.textContent=label;labelLayer.append(t); }); people.forEach(p=>{const {x,y}=positions[p.id], g=make('g',{class:`node ${p.type}`,transform:`translate(${x} ${y})`,'data-id':p.id}); const r=p.id===selected?35:30;g.append(make('circle',{r})); const en=make('text',{class:'en',y:-3});en.textContent=p.en.split(' / ')[0];g.append(en);const zh=make('text',{class:'zh',y:15});zh.textContent=p.zh.split(' / ')[0];g.append(zh);const type=make('text',{class:'type',y:48});type.textContent=p.type==='god'?'GOD':p.type==='demigod'?'DEMIGOD':'MORTAL';g.append(type);g.addEventListener('click',()=>select(p.id));nodeLayer.append(g); }); if(selected) highlight(selected); }
+function highlight(id){document.querySelectorAll('.edge,.edge-label,.node').forEach(e=>{const related=e.dataset?.a===id||e.dataset?.b===id; if(e.classList.contains('node')) e.classList.toggle('dimmed',e.dataset.id!==id&&!relatedPerson(e.dataset.id,id)); else {e.classList.toggle('related',related);e.classList.toggle('related',related);e.classList.toggle('related',related);} }); document.querySelector(`.node[data-id="${id}"]`)?.classList.add('selected'); document.querySelectorAll('.edge-label').forEach(e=>e.classList.toggle('related',e.dataset.a===id||e.dataset.b===id)); }
+function relatedPerson(a,b){return edges.some(e=>(e[0]===a&&e[1]===b)||(e[1]===a&&e[0]===b));}
+function select(id){selected=id; const p=byId[id]; const related=edges.filter(e=>e[0]===id||e[1]===id); content.innerHTML=`<div class="kind">${p.type==='god'?'GOD · 神':p.type==='demigod'?'DEMIGOD · 半神':'MORTAL · 凡人'}</div><h2>${p.en.split(' / ')[0]}<small>${p.zh}</small></h2><div class="rule"></div><p><strong>身份</strong><br>${p.role}</p><p><strong>关系</strong><br>${p.relations}</p><p><strong>事迹</strong><br>${p.facts}</p>${p.works?`<p><strong>十二项功绩</strong></p><ul>${p.works.split('、').map(x=>`<li>${x}</li>`).join('')}</ul>`:''}<p><strong>符号</strong><br><span class="symbols">${p.symbols}</span></p><p class="related-title">CONNECTED STARS · 相关人物</p><p>${related.map(e=>{const other=byId[e[0]===id?e[1]:e[0]];return `<strong>${other.en.split(' / ')[0]}</strong> · ${e[2]}`}).join('<br>')||'暂无直接连线'}</p>`; panel.classList.add('open'); draw(); }
+density.addEventListener('input',()=>{densityValue.textContent=density.value<34?'疏朗':density.value>66?'紧密':'居中';layout();}); document.getElementById('close').addEventListener('click',()=>{selected=null;panel.classList.remove('open');draw();}); addEventListener('resize',layout); layout();
+</script>
+</body>
+</html>
